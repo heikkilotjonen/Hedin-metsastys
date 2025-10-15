@@ -1,9 +1,26 @@
 import pygame
 import random
+import sys
 
 class RoboPeli:
     def __init__(self):
         pygame.init()
+
+        #MUSIIKKI
+        pygame.mixer.init()
+
+        self.playlist = [
+            "easterpink.mp3",
+            "wenotlikeyou.mp3"]
+        
+        self.current_track = 0
+
+        self.MUSIC_END = pygame.USEREVENT + 1
+        pygame.mixer.music.set_endevent(self.MUSIC_END)
+
+        pygame.mixer.music.load(self.playlist[self.current_track])
+        pygame.mixer.music.play()
+        #MUSIIKKI
 
         self.tausta = pygame.image.load("tausta.png")
         self.robo = pygame.image.load("robo.png")
@@ -104,6 +121,15 @@ class RoboPeli:
                 if tapahtuma.key == pygame.K_DOWN:
                     self.alas = False
 
+            if tapahtuma.type == self.MUSIC_END:
+
+                self.current_track = (self.current_track + 1) % len(self.playlist)
+                seuraava = self.playlist[self.current_track]
+
+                pygame.mixer.music.load(seuraava)
+                pygame.mixer.music.play()
+
+
             if tapahtuma.type == pygame.QUIT:
                 exit()
 
@@ -126,10 +152,9 @@ class RoboPeli:
             self.nayttö.blit(self.häviö_teksti, self.häviö_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 - 40)))
             self.nayttö.blit(self.ohjeet_teksti, self.ohjeet_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 + 20)))
             self.nayttö.blit(self.poistu_teksti, self.poistu_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 + 60)))
-            self.nayttö.blit(self.robo, (self.x, self.y))
             return
         
-        pelaajan_nopeus = 0.3
+        pelaajan_nopeus = 0.6
 
         if self.ylös:
             if self.y > 0:
@@ -199,7 +224,7 @@ class RoboPeli:
 
     def hirviö_liikkuu(self):
 
-        hirvion_nopeus = 0.2
+        hirvion_nopeus = 0.48
 
         self.nayttö.blit(self.hirviö, (self.hirviö_x, self.hirviö_y))
         if self.karattu:
