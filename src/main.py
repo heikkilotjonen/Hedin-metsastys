@@ -1,10 +1,10 @@
 import pygame
 import random
-import sys
 
 class RoboPeli:
     def __init__(self):
         pygame.init()
+        self.kello = pygame.time.Clock()
 
         #MUSIIKKI
         pygame.mixer.init()
@@ -40,9 +40,11 @@ class RoboPeli:
         self.hirviö_x = random.randint((0+self.hirviön_leveys), 220)
         self.hirviö_y = random.randint((0+self.hirviön_korkeus), 140)
 
+        self.outline = pygame.font.SysFont("Georgia", 61)
         self.fontti = pygame.font.SysFont("Georgia", 60)
-        self.medium_fontti = pygame.font.SysFont("Arial", 40)
+        self.poutline = pygame.font.SysFont("Arial", 31)
         self.pienempi_fontti = pygame.font.SysFont("Arial", 30)
+
         self.voitto_teksti = self.fontti.render("Nettspend sai hedit", True, (0, 0, 255))
         self.vohjeet_teksti = self.pienempi_fontti.render("F2 yrittääkseen uutta keissiä", True, (0, 0, 255))
         self.vpoistu_teksti = self.pienempi_fontti.render("ESC poistuaksesi", True, (0, 0, 255))
@@ -62,8 +64,23 @@ class RoboPeli:
 
         self.uusi_peli()
 
+    def piirra_teksti_outline(self, fontti, teksti, vari, outline_vari, center, outline_paksuus=2):
+        """Piirtää tekstin mustalla reunuksella."""
+        text_surface = fontti.render(teksti, True, vari)
+        outline_surface = fontti.render(teksti, True, outline_vari)
+        text_rect = text_surface.get_rect(center=center)
+
+        for dx in range(-outline_paksuus, outline_paksuus + 1):
+            for dy in range(-outline_paksuus, outline_paksuus + 1):
+                if dx != 0 or dy != 0:
+                    outline_rect = outline_surface.get_rect(center=(center[0] + dx, center[1] + dy))
+                    self.nayttö.blit(outline_surface, outline_rect)
+
+        self.nayttö.blit(text_surface, text_rect)
+
     def silmukka(self):
         while True:
+            self.kello.tick(60)
             self.tutki_tapahtumat()
             self.liiku()
             self.kolikko_löydetty()
@@ -139,22 +156,30 @@ class RoboPeli:
             self.nayttö.blit(self.ovi, (self.oven_sijainti_x, self.oven_sijainti_y))
             self.nayttö.blit(self.hirviö, (self.hirviö_x, self.hirviö_y))
             self.nayttö.blit(self.robo, (self.x, self.y))
-            self.nayttö.blit(self.voitto_teksti, self.voitto_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 - 40)))
-            self.nayttö.blit(self.vohjeet_teksti, self.vohjeet_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 + 20)))
-            self.nayttö.blit(self.vpoistu_teksti, self.vpoistu_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 + 60)))
-            
+
+            self.piirra_teksti_outline(self.fontti, "Nettspend sai hedit", (0, 0, 255), (0, 0, 0),
+                                       (self.nayton_leveys/2, self.nayton_korkeus/2 - 40))
+            self.piirra_teksti_outline(self.pienempi_fontti, "F2 yrittääkseen uutta keissiä", (0, 0, 255), (0, 0, 0),
+                                       (self.nayton_leveys/2, self.nayton_korkeus/2 + 20))
+            self.piirra_teksti_outline(self.pienempi_fontti, "ESC poistuaksesi", (0, 0, 255), (0, 0, 0),
+                                       (self.nayton_leveys/2, self.nayton_korkeus/2 + 60))
             return
+
         if self.kiinni:
             self.nayttö.blit(self.tausta, (0, 0))
             self.nayttö.blit(self.ovi, (self.oven_sijainti_x, self.oven_sijainti_y))
             self.nayttö.blit(self.hirviö, (self.hirviö_x, self.hirviö_y))
             self.nayttö.blit(self.robo, (self.x, self.y))
-            self.nayttö.blit(self.häviö_teksti, self.häviö_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 - 40)))
-            self.nayttö.blit(self.ohjeet_teksti, self.ohjeet_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 + 20)))
-            self.nayttö.blit(self.poistu_teksti, self.poistu_teksti.get_rect(center=(self.nayton_leveys/2, self.nayton_korkeus/2 + 60)))
+
+            self.piirra_teksti_outline(self.fontti, "Fakemink juggasi sinut", (255, 0, 0), (0, 0, 0),
+                                       (self.nayton_leveys/2, self.nayton_korkeus/2 - 40))
+            self.piirra_teksti_outline(self.pienempi_fontti, "F2 yrittääkseen uutta keissiä", (255, 0, 0), (0, 0, 0),
+                                       (self.nayton_leveys/2, self.nayton_korkeus/2 + 20))
+            self.piirra_teksti_outline(self.pienempi_fontti, "ESC poistuaksesi", (255, 0, 0), (0, 0, 0),
+                                       (self.nayton_leveys/2, self.nayton_korkeus/2 + 60))
             return
         
-        pelaajan_nopeus = 0.6
+        pelaajan_nopeus = 4
 
         if self.ylös:
             if self.y > 0:
@@ -224,7 +249,7 @@ class RoboPeli:
 
     def hirviö_liikkuu(self):
 
-        hirvion_nopeus = 0.48
+        hirvion_nopeus = 3
 
         self.nayttö.blit(self.hirviö, (self.hirviö_x, self.hirviö_y))
         if self.karattu:
