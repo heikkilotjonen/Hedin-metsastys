@@ -22,7 +22,10 @@ class RoboPeli:
         pygame.mixer.music.play()
         #MUSIIKKI
 
+        self.taustat = ["tausta.png", "tausta2.png"]
+
         self.tausta = pygame.image.load("tausta.png")
+        self.tausta2 = pygame.image.load("tausta2.png")
         self.robo = pygame.image.load("robo.png")
         self.kolikko = pygame.image.load("kolikko.png")
         self.ovi = pygame.image.load("ovi.png")
@@ -60,7 +63,12 @@ class RoboPeli:
         pygame.display.set_caption("Hedin metsästys")
         pygame.display.flip()
 
-        self.tausta = pygame.transform.scale(self.tausta, (self.nayton_leveys, self.nayton_korkeus))
+        #TAUSTAKUVAT
+        self.taustat = ["tausta.png", "tausta2.png"]
+        self.tausta_indeksi = 0
+        self.taustakuvat = [pygame.image.load(t) for t in self.taustat]
+        self.tausta = pygame.transform.scale(self.taustakuvat[self.tausta_indeksi], (self.nayton_leveys, self.nayton_korkeus))
+        #TAUSTAKUVAT
 
         self.uusi_peli()
 
@@ -124,6 +132,10 @@ class RoboPeli:
                 if tapahtuma.key == pygame.K_DOWN:
                     self.alas = True
                 if tapahtuma.key == pygame.K_F2:
+                    self.uusi_peli()
+                if tapahtuma.key == pygame.K_F3:
+                    self.tausta_indeksi = (self.tausta_indeksi + 1) % len(self.taustakuvat)
+                    self.tausta = pygame.transform.scale(self.taustakuvat[self.tausta_indeksi], (self.nayton_leveys, self.nayton_korkeus))
                     self.uusi_peli()
                 if tapahtuma.key == pygame.K_ESCAPE:
                     exit()
@@ -249,7 +261,7 @@ class RoboPeli:
 
     def hirviö_liikkuu(self):
 
-        hirvion_nopeus = 3
+        hirvion_nopeus = 3.12
 
         self.nayttö.blit(self.hirviö, (self.hirviö_x, self.hirviö_y))
         if self.karattu:
